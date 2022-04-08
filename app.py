@@ -11,6 +11,7 @@ from starlette.staticfiles import StaticFiles
 from driftt.endpoints import HomeEndpoint
 from driftt.piccolo_app import APP_CONFIG
 from driftt.tables import DrifttUser, Site, Resource
+from driftt.tables import ResourceType
 
 
 app = FastAPI(
@@ -29,6 +30,12 @@ app = FastAPI(
 )
 
 
+
+
+
+
+
+
 DrifttUserIn: t.Any = create_pydantic_model(
     table=DrifttUser,
     model_name="DrifttUserIn",
@@ -38,10 +45,20 @@ DrifttUserOut: t.Any = create_pydantic_model(
     table=DrifttUser, include_default_columns=True, model_name="DrifttUserOut"
 )
 
-SiteIn: t.Any = create_pydantic_model(table=Site, model_name="SiteIn")
+SiteIn: t.Any = create_pydantic_model(
+    table=Site,
+    model_name="SiteIn",
+    exclude_columns=(Site.created, Site.last_modified,))
 SiteOut: t.Any = create_pydantic_model(
-    table=Site, include_default_columns=True, model_name="SiteOut"
-)
+    table=Site, include_default_columns=True, model_name="SiteOut")
+
+
+# The create_pydantic_model function messes up some of the schemas
+# Seehttps://github.com/piccolo-orm/piccolo/issues/467
+# class ResourceInExtended(SiteIn):
+#     type: ResourceType
+
+
 
 
 @app.get("/users/", response_model=t.List[DrifttUserOut])
@@ -96,6 +113,7 @@ async def sites():
 
 @app.post("/sites/", response_model=SiteOut)
 async def create_site(site_model: SiteIn):
+
     site = Site(**site_model.dict())
     await site.save()
     return site.to_dict()
@@ -103,11 +121,11 @@ async def create_site(site_model: SiteIn):
 
 @app.put("/sites/{site_id}/", response_model=SiteOut)
 async def update_site(site_id: int, site_model: SiteIn):
-    site = await User.objects().get(Site.id == site_id)
+    site = await Site.objects().get(Site.id == site_id)
     if not site:
         return JSONResponse({}, status_code=404)
 
-    for key, value in site_modell.dict().items():
+    for key, value in site_model.dict().items():
         setattr(site, key, value)
 
     await site.save()

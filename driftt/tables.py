@@ -17,7 +17,7 @@ class DrifttUser(Table):
 class Site(Table):
     display_name = Varchar()
     institution = Varchar()
-    admin = ForeignKey(references=DrifttUser)
+    admin = ForeignKey(DrifttUser)
     domain = Varchar()
     created = Timestamp()
     last_modified = Timestamp()
@@ -32,6 +32,6 @@ class ResourceType(str, enum.Enum):
 
 class Resource(Table):
     title = Varchar()
-    author = ForeignKey(references=DrifttUser)
+    author = ForeignKey(DrifttUser)
     content = Text()
     type = Varchar(choices=ResourceType)

@@ -20,8 +20,7 @@ APP_CONFIG = AppConfig(
     migrations_folder_path=os.path.join(
         CURRENT_DIRECTORY, "piccolo_migrations"
     ),
-    table_classes=[DrifttUser],
-    # table_classes=table_finder(modules=["driftt.tables"], exclude_imported=True),
+    table_classes=table_finder(modules=["driftt.tables"], exclude_imported=True),
     migration_dependencies=[],
     commands=[],
 )
