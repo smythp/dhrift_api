@@ -35,3 +35,5 @@ class Resource(Table):
     author = ForeignKey(DrifttUser)
     content = Text()
     type = Varchar(choices=ResourceType)
+    created = Timestamp()
+    last_modified = Timestamp()

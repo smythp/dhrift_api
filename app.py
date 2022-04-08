@@ -53,10 +53,18 @@ SiteOut: t.Any = create_pydantic_model(
     table=Site, include_default_columns=True, model_name="SiteOut")
 
 
+ResourceIn: t.Any = create_pydantic_model(
+    table=Resource,
+    model_name="ResourceIn",
+    exclude_columns=(Resource.created, Resource.last_modified,))
+ResourceOut: t.Any = create_pydantic_model(
+    table=Resource, include_default_columns=True, model_name="ResourceOut")
+
+
 # The create_pydantic_model function messes up some of the schemas
 # Seehttps://github.com/piccolo-orm/piccolo/issues/467
-# class ResourceInExtended(SiteIn):
-#     type: ResourceType
+class ResourceInExtended(ResourceIn):
+    type: ResourceType
 
 
 
@@ -143,6 +151,46 @@ async def delete_site(site_id: int):
 
     return JSONResponse({})
 
+
+
+# Resource schema
+
+@app.get("/resources/", response_model=t.List[ResourceOut])
+async def resources():
+    return await Resource.select().order_by(Resource.id)
+
+
+@app.post("/resources/", response_model=ResourceOut)
+async def create_resource(resource_model: ResourceInExtended):
+
+    resource = Resource(**resource_model.dict())
+    await resource.save()
+    return resource.to_dict()
+
+
+@app.put("/resources/{resource_id}/", response_model=ResourceOut)
+async def update_resource(resource_id: int, resource_model: ResourceInExtended):
+    resource = await Resource.objects().get(Resource.id == resource_id)
+    if not resource:
+        return JSONResponse({}, status_code=404)
+
+    for key, value in resource_model.dict().items():
+        setattr(resource, key, value)
+
+    await resource.save()
+
+    return resource.to_dict()
+
+
+@app.delete("/resources/{resource_id}/")
+async def delete_resource(resource_id: int):
+    resource = await Resource.objects().get(Resource.id == resource_id)
+    if not resource:
+        return JSONResponse({}, status_code=404)
+
+    await resource.remove()
+
+    return JSONResponse({})
 
 
 
