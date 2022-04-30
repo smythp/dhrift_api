@@ -15,16 +15,21 @@ from driftt.piccolo_app import APP_CONFIG
 from driftt.tables import DrifttUser, Site, Resource
 from driftt.tables import ResourceType
 
+from metadata import title, description, tags
 from security import (
     hash,
     Token,
     authenticate_user,
     ACCESS_TOKEN_EXPIRE_MINUTES,
+    AuthCredentials,
     create_access_token,
 )
 
 
 app = FastAPI(
+    title=title,
+    description=description,
+    openapi_tags=tags,
     routes=[
         Route("/", HomeEndpoint),
         Mount(
@@ -40,10 +45,12 @@ app = FastAPI(
 )
 
 
-@app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+@app.post("/token", response_model=Token, tags=["users"])
+async def login_for_access_token(form_data: AuthCredentials = Depends()):
 
-    user = await authenticate_user(form_data.username, form_data.password)
+    user = await authenticate_user(
+        form_data.username, form_data.password.get_secret_value()
+    )
 
     if not user:
         raise HTTPException(
@@ -88,6 +95,7 @@ ResourceIn: t.Any = create_pydantic_model(
         Resource.last_modified,
     ),
 )
+
 ResourceOut: t.Any = create_pydantic_model(
     table=Resource, include_default_columns=True, model_name="ResourceOut"
 )
@@ -99,12 +107,12 @@ class ResourceInExtended(ResourceIn):
     type: ResourceType
 
 
-@app.get("/users/", response_model=t.List[DrifttUserOut])
+@app.get("/users/", response_model=t.List[DrifttUserOut], tags=["users"])
 async def users():
     return await DrifttUser.select().order_by(DrifttUser.id)
 
 
-@app.post("/users/", response_model=DrifttUserOut)
+@app.post("/users/", response_model=DrifttUserOut, tags=["users"])
 async def create_user(user_model: DrifttUserIn):
 
     user_model.password = hash(user_model.password)
@@ -115,7 +123,7 @@ async def create_user(user_model: DrifttUserIn):
     return user.to_dict()
 
 
-@app.put("/users/{user_id}/", response_model=DrifttUserOut)
+@app.put("/users/{user_id}/", response_model=DrifttUserOut, tags=["users"])
 async def update_user(user_id: int, user_model: DrifttUserIn):
     user = await DrifttUser.objects().get(DrifttUser.id == user_id)
     if not user:
@@ -129,7 +137,7 @@ async def update_user(user_id: int, user_model: DrifttUserIn):
     return user.to_dict()
 
 
-@app.delete("/users/{user_id}/")
+@app.delete("/users/{user_id}/", tags=["users"])
 async def delete_user(user_id: int):
     user = await DrifttUser.objects().get(DrifttUser.id == user_id)
     if not user:
@@ -143,12 +151,12 @@ async def delete_user(user_id: int):
 ## Site schema
 
 
-@app.get("/sites/", response_model=t.List[SiteOut])
+@app.get("/sites/", response_model=t.List[SiteOut], tags=["sites"])
 async def sites():
     return await Site.select().order_by(Site.id)
 
 
-@app.post("/sites/", response_model=SiteOut)
+@app.post("/sites/", response_model=SiteOut, tags=["sites"])
 async def create_site(site_model: SiteIn):
 
     site = Site(**site_model.dict())
@@ -156,7 +164,7 @@ async def create_site(site_model: SiteIn):
     return site.to_dict()
 
 
-@app.put("/sites/{site_id}/", response_model=SiteOut)
+@app.put("/sites/{site_id}/", response_model=SiteOut, tags=["sites"])
 async def update_site(site_id: int, site_model: SiteIn):
     site = await Site.objects().get(Site.id == site_id)
     if not site:
@@ -170,7 +178,7 @@ async def update_site(site_id: int, site_model: SiteIn):
     return site.to_dict()
 
 
-@app.delete("/sites/{site_id}/")
+@app.delete("/sites/{site_id}/", tags=["sites"])
 async def delete_site(site_id: int):
     site = await Site.objects().get(Site.id == site_id)
     if not site:
@@ -184,12 +192,12 @@ async def delete_site(site_id: int):
 # Resource schema
 
 
-@app.get("/resources/", response_model=t.List[ResourceOut])
+@app.get("/resources/", response_model=t.List[ResourceOut], tags=["resources"])
 async def resources():
     return await Resource.select().order_by(Resource.id)
 
 
-@app.post("/resources/", response_model=ResourceOut)
+@app.post("/resources/", response_model=ResourceOut, tags=["resources"])
 async def create_resource(resource_model: ResourceInExtended):
 
     resource = Resource(**resource_model.dict())
@@ -197,7 +205,7 @@ async def create_resource(resource_model: ResourceInExtended):
     return resource.to_dict()
 
 
-@app.put("/resources/{resource_id}/", response_model=ResourceOut)
+@app.put("/resources/{resource_id}/", response_model=ResourceOut, tags=["resources"])
 async def update_resource(resource_id: int, resource_model: ResourceInExtended):
     resource = await Resource.objects().get(Resource.id == resource_id)
     if not resource:
@@ -211,7 +219,7 @@ async def update_resource(resource_id: int, resource_model: ResourceInExtended):
     return resource.to_dict()
 
 
-@app.delete("/resources/{resource_id}/")
+@app.delete("/resources/{resource_id}/", tags=["resources"])
 async def delete_resource(resource_id: int):
     resource = await Resource.objects().get(Resource.id == resource_id)
     if not resource:

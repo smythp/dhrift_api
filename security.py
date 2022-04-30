@@ -5,7 +5,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from passlib.hash import bcrypt_sha256
 
@@ -18,9 +18,9 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-DrifttUserModel = create_pydantic_model(
-    table=DrifttUser, include_default_columns=True, model_name="DrifttUserOut"
-)
+class AuthCredentials(BaseModel):
+    username: str
+    password: SecretStr
 
 
 fake_users_db = {
@@ -50,7 +50,7 @@ class TokenData(BaseModel):
 #     disabled: Optional[bool] = None
 
 
-class UserInDB(DrifttUserModel):
+class UserInDB(AuthCredentials):
     hashed_password: str
 
 
@@ -123,22 +123,22 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 async def get_current_active_user(
-    current_user: DrifttUserModel = Depends(get_current_user),
+    current_user: AuthCredentials = Depends(get_current_user),
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-# @app.get("/users/me/", response_model=DrifttUserModel)
+# @app.get("/users/me/", response_model=AuthCredentials)
 async def read_users_me(
-    current_user: DrifttUserModel = Depends(get_current_active_user),
+    current_user: AuthCredentials = Depends(get_current_active_user),
 ):
     return current_user
 
 
 # @app.get("/users/me/items/")
 async def read_own_items(
-    current_user: DrifttUserModel = Depends(get_current_active_user),
+    current_user: AuthCredentials = Depends(get_current_active_user),
 ):
     return [{"item_id": "Foo", "owner": current_user.username}]
