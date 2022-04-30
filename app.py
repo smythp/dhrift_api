@@ -15,8 +15,13 @@ from driftt.piccolo_app import APP_CONFIG
 from driftt.tables import DrifttUser, Site, Resource
 from driftt.tables import ResourceType
 
-from security import hash, Token, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
-
+from security import (
+    hash,
+    Token,
+    authenticate_user,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    create_access_token,
+)
 
 
 app = FastAPI(
@@ -48,16 +53,15 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user['username']}, expires_delta=access_token_expires
+        data={"sub": user["username"]}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
 
 
 DrifttUserIn: t.Any = create_pydantic_model(
     table=DrifttUser,
     model_name="DrifttUserIn",
-    exclude_columns=(DrifttUser.last_modified,)
+    exclude_columns=(DrifttUser.last_modified,),
 )
 DrifttUserOut: t.Any = create_pydantic_model(
     table=DrifttUser, include_default_columns=True, model_name="DrifttUserOut"
@@ -66,17 +70,27 @@ DrifttUserOut: t.Any = create_pydantic_model(
 SiteIn: t.Any = create_pydantic_model(
     table=Site,
     model_name="SiteIn",
-    exclude_columns=(Site.created, Site.last_modified,))
+    exclude_columns=(
+        Site.created,
+        Site.last_modified,
+    ),
+)
 SiteOut: t.Any = create_pydantic_model(
-    table=Site, include_default_columns=True, model_name="SiteOut")
+    table=Site, include_default_columns=True, model_name="SiteOut"
+)
 
 
 ResourceIn: t.Any = create_pydantic_model(
     table=Resource,
     model_name="ResourceIn",
-    exclude_columns=(Resource.created, Resource.last_modified,))
+    exclude_columns=(
+        Resource.created,
+        Resource.last_modified,
+    ),
+)
 ResourceOut: t.Any = create_pydantic_model(
-    table=Resource, include_default_columns=True, model_name="ResourceOut")
+    table=Resource, include_default_columns=True, model_name="ResourceOut"
+)
 
 
 # The create_pydantic_model function messes up some of the schemas
@@ -85,13 +99,9 @@ class ResourceInExtended(ResourceIn):
     type: ResourceType
 
 
-
-
 @app.get("/users/", response_model=t.List[DrifttUserOut])
 async def users():
     return await DrifttUser.select().order_by(DrifttUser.id)
-
-
 
 
 @app.post("/users/", response_model=DrifttUserOut)
@@ -100,8 +110,6 @@ async def create_user(user_model: DrifttUserIn):
     user_model.password = hash(user_model.password)
 
     user = DrifttUser(**user_model.dict())
-
-
 
     await user.save()
     return user.to_dict()
@@ -112,8 +120,6 @@ async def update_user(user_id: int, user_model: DrifttUserIn):
     user = await DrifttUser.objects().get(DrifttUser.id == user_id)
     if not user:
         return JSONResponse({}, status_code=404)
-
-
 
     for key, value in user_model.dict().items():
         setattr(user, key, value)
@@ -135,6 +141,7 @@ async def delete_user(user_id: int):
 
 
 ## Site schema
+
 
 @app.get("/sites/", response_model=t.List[SiteOut])
 async def sites():
@@ -174,8 +181,8 @@ async def delete_site(site_id: int):
     return JSONResponse({})
 
 
-
 # Resource schema
+
 
 @app.get("/resources/", response_model=t.List[ResourceOut])
 async def resources():
@@ -213,7 +220,6 @@ async def delete_resource(resource_id: int):
     await resource.remove()
 
     return JSONResponse({})
-
 
 
 @app.on_event("startup")

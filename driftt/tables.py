@@ -7,7 +7,7 @@ class DrifttUser(Table):
     # id = UUID()
     first_name = Varchar()
     last_name = Varchar()
-    username = Varchar()    
+    username = Varchar()
     password = Varchar(secret=True)
     confirmed = Boolean
     email = Varchar()
@@ -24,10 +24,10 @@ class Site(Table):
 
 
 class ResourceType(str, enum.Enum):
-    workshop = 'workshop'
-    guide = 'guide'
-    insight = 'insight'
-    other = 'other'
+    workshop = "workshop"
+    guide = "guide"
+    insight = "insight"
+    other = "other"
 
 
 class Resource(Table):
