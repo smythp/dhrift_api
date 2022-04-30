@@ -12,14 +12,14 @@ DESCRIPTION = ""
 
 async def forwards():
     manager = MigrationManager(
-        migration_id=ID, app_name="driftt", description=DESCRIPTION
+        migration_id=ID, app_name="dhrift", description=DESCRIPTION
     )
 
-    manager.add_table("DrifttUser", tablename="driftt_user")
+    manager.add_table("DrifttUser", tablename="dhrift_user")
 
     manager.add_column(
         table_class_name="DrifttUser",
-        tablename="driftt_user",
+        tablename="dhrift_user",
         column_name="first_name",
         db_column_name="first_name",
         column_class_name="Varchar",
@@ -40,7 +40,7 @@ async def forwards():
 
     manager.add_column(
         table_class_name="DrifttUser",
-        tablename="driftt_user",
+        tablename="dhrift_user",
         column_name="last_name",
         db_column_name="last_name",
         column_class_name="Varchar",
@@ -61,7 +61,7 @@ async def forwards():
 
     manager.add_column(
         table_class_name="DrifttUser",
-        tablename="driftt_user",
+        tablename="dhrift_user",
         column_name="email",
         db_column_name="email",
         column_class_name="Varchar",
@@ -82,7 +82,7 @@ async def forwards():
 
     manager.add_column(
         table_class_name="DrifttUser",
-        tablename="driftt_user",
+        tablename="dhrift_user",
         column_name="last_modified",
         db_column_name="last_modified",
         column_class_name="Date",

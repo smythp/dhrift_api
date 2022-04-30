@@ -16,10 +16,10 @@ python main.py
 
 and head to the /docs.
 
-I used Postgres since it allows for automatic migrations. Create a Postcres database named `driftt`. Then run the migrations:
+I used Postgres since it allows for automatic migrations. Create a Postcres database named `dhrift`. Then run the migrations:
 
 ```bash
-piccolo migrations forwards driftt
+piccolo migrations forwards dhrift
 ```
 
 If you want to try the Piccolo admin (kind of like the DJango admin), also run these migrations:

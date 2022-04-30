@@ -12,7 +12,7 @@ from piccolo.columns.indexes import IndexMethod
 from piccolo.table import Table
 
 
-class DrifttUser(Table, tablename="driftt_user"):
+class DrifttUser(Table, tablename="dhrift_user"):
     id = Serial(
         null=False,
         primary_key=True,
@@ -32,7 +32,7 @@ DESCRIPTION = ""
 
 async def forwards():
     manager = MigrationManager(
-        migration_id=ID, app_name="driftt", description=DESCRIPTION
+        migration_id=ID, app_name="dhrift", description=DESCRIPTION
     )
 
     manager.add_table("Resource", tablename="resource")

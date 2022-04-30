@@ -10,10 +10,10 @@ from piccolo.engine import engine_finder
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 
-from driftt.endpoints import HomeEndpoint
-from driftt.piccolo_app import APP_CONFIG
-from driftt.tables import DrifttUser, Site, Resource
-from driftt.tables import ResourceType
+from dhrift.endpoints import HomeEndpoint
+from dhrift.piccolo_app import APP_CONFIG
+from dhrift.tables import DrifttUser, Site, Resource
+from dhrift.tables import ResourceType
 
 from metadata import title, description, tags
 from security import (

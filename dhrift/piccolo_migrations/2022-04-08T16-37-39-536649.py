@@ -11,7 +11,7 @@ DESCRIPTION = ""
 
 async def forwards():
     manager = MigrationManager(
-        migration_id=ID, app_name="driftt", description=DESCRIPTION
+        migration_id=ID, app_name="dhrift", description=DESCRIPTION
     )
 
     manager.add_column(

@@ -10,7 +10,7 @@ from pydantic import BaseModel, SecretStr
 from passlib.hash import bcrypt_sha256
 
 from piccolo_api.crud.serializers import create_pydantic_model
-from driftt.tables import DrifttUser
+from dhrift.tables import DrifttUser
 
 
 SECRET_KEY = "be263c3c3ade0d9ac4adb239f901e1deb5cd1d12fa03ee1de135064874dbe09b"
